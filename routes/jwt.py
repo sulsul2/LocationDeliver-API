@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from passlib.context import CryptContext
-from db.connection import cursor
+from db.connection import connectDB
 
 SECRET_KEY = "hadsfiklueirhjaiowqujerioj^&*kjhBJHLKH!@!@@SFAF!@kljlasLJJ:ashafayasyafBKJHSWDkljlkJsd"
 ALGORITHM = "HS256"
@@ -41,9 +41,13 @@ async def get_user(token: Annotated[str, Depends(oauth2_scheme)]):
             raise credentials_exception
     except:
         raise credentials_exception
-    query = ("SELECT * FROM users WHERE username = %s")
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM users WHERE username = %s"
     cursor.execute(query, (username,))
     result = cursor.fetchone()
+    cursor.close()
+    conn.close()
     if not result :
         raise credentials_exception
     else :
@@ -62,9 +66,13 @@ async def check_is_admin(token: Annotated[bool, Depends(oauth2_scheme)]):
             raise credentials_exception
     except:
         raise credentials_exception
-    query = ("SELECT * FROM users WHERE username = %s")
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT * FROM users WHERE username = %s"
     cursor.execute(query, (username,))
     result = cursor.fetchone()
+    cursor.close()
+    conn.close()
     if not result:
         raise credentials_exception
     elif result['role'] != "admin":
