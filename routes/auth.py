@@ -28,7 +28,7 @@ async def login_for_access_token(username: str = Form(...), password: str = Form
             data={"sub": username}, expires_delta=access_token_expires
         )
         
-        friend_service_url = "https://restaurant-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/login/single"
+        friend_service_url = "https://resto-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/login/single"
 
         friend_token_data = {
             "username": username,
@@ -96,7 +96,7 @@ async def register(username: str = Form(...), password: str = Form(...), role: s
     conn.close()
 
     if flag : 
-        friend_service_url = "https://restaurant-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/register"
+        friend_service_url = "https://resto-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/register"
 
         friend_data = {
             "username": username,

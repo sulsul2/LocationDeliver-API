@@ -1,5 +1,6 @@
 from typing import Annotated, List
 import requests
+from models.order import Order
 from models.user import User
 from fastapi import APIRouter, Depends
 from routes.auth import get_user
@@ -10,7 +11,7 @@ menu = APIRouter()
 
 @menu.get('/menu')
 async def get_menu(user: Annotated[User, Depends(get_user)]) :
-    url = "https://restaurant-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/menu/stok/"
+    url = "https://resto-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/menu/stok/"
     headers = {
         "Authorization": f"Bearer {user['friend_token']}"
     }
@@ -34,8 +35,8 @@ async def get_menu(user: Annotated[User, Depends(get_user)]) :
         return("Terjadi kesalahan saat mengakses API:", e)
 
 @menu.post('/pesanan')
-async def create_pesanan (data_to_add: List[Menu], user: Annotated[User, Depends(get_user)]) :
-    url = "https://restaurant-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/pesanan/createdata"
+async def create_pesanan (data_to_add: List[Menu], is_hemat : bool, user: Annotated[User, Depends(get_user)]) :
+    url = "https://resto-hemat-api.ambitiousmoss-bd081c95.australiaeast.azurecontainerapps.io/pesanan/createdata"
     headers = {
         "Authorization": f"Bearer {user['friend_token']}"
     }
@@ -51,13 +52,26 @@ async def create_pesanan (data_to_add: List[Menu], user: Annotated[User, Depends
         response = requests.post(url, json = input, headers=headers)
         data = response.json()
 
-        # order_data = {
-        #     "time" : "minutes",
-        #     "price" : 10000
-        # }
+        order_data = {
+            "time" : "minutes",
+            "price" : data['Total'],
+            "user_id" : user['id'],
+            "food_id" : 17,
+            "is_hemat" : is_hemat,
+            "pesanan_id" : data['Data'][0]['Id'],
+            "shipping_price" : 10
+        }
+
+        order = Order(**order_data)
+
+        new_order_data = await write_data(order, True, user)
+
         return {
             "message" : "Get Success",
-            "data" : data
+            "data" : {
+                "order_detail": data,
+                "delivery_order": new_order_data
+            }
         }
     except requests.RequestException as e:
         return("Terjadi kesalahan saat mengakses API:", e)
