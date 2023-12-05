@@ -148,27 +148,27 @@ async def update_data(order: Order, id:int, check: Annotated[bool, Depends(check
         "data" : new_order
     }
 
-# @order.delete('/order/{id}')
-# async def delete_data(id: int, check: Annotated[bool, Depends(check_is_admin)]):
-#     if not check:
-#         return
-#     conn = connectDB()
-#     cursor = conn.cursor(dictionary=True)
-#     select_query = "SELECT * FROM orders WHERE id = %s;"
-#     cursor.execute(select_query, (id,))
-#     data = cursor.fetchone()
-#     if data is None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Data order id {id} Not Found")
+@order.delete('/order/{id}')
+async def delete_data(id: int, check: Annotated[bool, Depends(check_is_admin)]):
+    if not check:
+        return
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
+    select_query = "SELECT * FROM orders WHERE id = %s;"
+    cursor.execute(select_query, (id,))
+    data = cursor.fetchone()
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Data order id {id} Not Found")
     
-#     query = "DELETE FROM orders WHERE id = %s;"
-#     cursor.execute(query, (id,))
-#     conn.commit()
+    query = "DELETE FROM orders WHERE id = %s;"
+    cursor.execute(query, (id,))
+    conn.commit()
 
-#     cursor.close()
-#     conn.close()
-#     return {
-#         "messages" : "Delete order successfully",
-#     }
+    cursor.close()
+    conn.close()
+    return {
+        "messages" : "Delete order successfully",
+    }
 
 @order.get('/order/price/{id}')
 async def get_order_price(id: int, hemat: bool, check: Annotated[bool, Depends(check_is_login)], user: Annotated[User, Depends(get_user)]):
