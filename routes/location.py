@@ -18,7 +18,7 @@ async def read_data(user: Annotated[User, Depends(get_user)]):
           cursor.close()
           conn.close()
           return {
-			"messages" : "Get All Location successfully",
+			"messages" : "Get All Location successfull",
 			"data" : data
         }
     else:
