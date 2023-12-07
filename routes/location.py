@@ -9,10 +9,11 @@ loc = APIRouter()
 
 @loc.get('/loc')
 async def read_data(user: Annotated[User, Depends(get_user)]):
+    print(user)
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
     if user['role'] == 'admin':
           query = "SELECT * FROM locs;"
-          conn = connectDB()
-          cursor = conn.cursor(dictionary=True)
           cursor.execute(query)
           data = cursor.fetchall()
           cursor.close()
@@ -21,30 +22,33 @@ async def read_data(user: Annotated[User, Depends(get_user)]):
 			"messages" : "Get All Location successfull",
 			"data" : data
         }
-    else:
+    elif user['role'] == 'user':
         query = "SELECT * FROM locs where id = %s"
-        conn = connectDB()
-        cursor = conn.cursor(dictionary=True)
         cursor.execute(query, (user['loc_id'],))
+        data = cursor.fetchall()
         cursor.close()
         conn.close()
-        data = cursor.fetchall()
-        return {
-			"messages" : "Get Your Location successfully",
-			"data" : data
-        }
+        if data :
+            return {
+                "messages" : "Get Your location successfully",
+                "data" : data
+            }
+        else :
+            return {
+                "messages" : "You don't have location yet please fill location first"
+            }
 
 @loc.get('/loc/{id}')
 async def read_data(id: int, check: Annotated[bool, Depends(check_is_login)]):
     if not check:
         return
-    select_query = "SELECT * FROM locs WHERE id = %s;"
     conn = connectDB()
     cursor = conn.cursor(dictionary=True)
+    select_query = "SELECT * FROM locs WHERE id = %s;"
     cursor.execute(select_query, (id,))
+    data = cursor.fetchall()
     cursor.close()
     conn.close()
-    data = cursor.fetchone()
 
     if data is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Data Loc id {id} Not Found")
