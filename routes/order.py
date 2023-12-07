@@ -199,7 +199,9 @@ async def get_order_price(id: int, hemat: bool, check: Annotated[bool, Depends(c
         price = price / 2
     else :
         price = price
-    return price
+    return {
+        "price" : price
+    }
 
 
 @order.get('/order/time/{id}')
@@ -231,7 +233,9 @@ async def get_order_time(id: int, hemat: bool, check: Annotated[bool, Depends(ch
         time = time * 2
     else :
         time = time
-    return time
+    return {
+        "time" : f"{time} minutes"
+    }
 
 
     
