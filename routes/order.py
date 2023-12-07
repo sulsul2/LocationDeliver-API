@@ -103,9 +103,9 @@ async def write_data(order: Order, check: Annotated[bool, Depends(check_is_login
     time = await get_order_time(order_json['food_id'], order_json['is_hemat'], True, user)
     shipping_price = await get_order_price(order_json['food_id'], order_json['is_hemat'], True, user)
 
-    time_string = f"{time} menit"
+    time_string = f"{time['time']} menit"
     query = "INSERT INTO orders (time, price, user_id, food_id, is_hemat, pesanan_id, shipping_price) VALUES (%s, %s, %s, %s, %s, %s, %s);"
-    cursor.execute(query, (time_string, order_json['price'], user['id'], order_json['food_id'], True, order_json['pesanan_id'], shipping_price,))
+    cursor.execute(query, (time_string, order_json['price'], user['id'], order_json['food_id'], True, order_json['pesanan_id'], shipping_price['price'],))
     conn.commit()
 
     select_query = "SELECT * FROM orders WHERE id = LAST_INSERT_ID();"

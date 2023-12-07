@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
 from fastapi import APIRouter, Depends, Form, HTTPException, status
-from routes.jwt import create_access_token, get_user
+from routes.jwt import check_is_admin, check_is_login, create_access_token, get_user
 from passlib.context import CryptContext
 from db.connection import connectDB
 import requests
@@ -125,3 +125,33 @@ async def register(username: str = Form(...), password: str = Form(...), role: s
 @auth.get("/users/me")
 async def read_users_me(current_user: Annotated[User, Depends(get_user)]):
     return current_user
+
+@auth.get("/users/all")
+async def read_users_all(admin: Annotated[bool, Depends(check_is_admin)]):
+    if not admin :
+        return {
+            "messages" : "You are not allowed to use this service"
+        }
+    query = ("SELECT * FROM users")
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query,)
+    result = cursor.fetchall()
+    return {
+        "data" : result
+    }
+    
+@auth.get("/users/food")
+async def read_users_all(check: Annotated[bool, Depends(check_is_login)]):
+    if not check :
+        return {
+            "messages" : "You are not authenticated"
+        }
+    query = ("SELECT * FROM users WHERE role = %s")
+    conn = connectDB()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query,("food",))
+    result = cursor.fetchall()
+    return {
+        "data" : result
+    }

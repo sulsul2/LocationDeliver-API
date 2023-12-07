@@ -42,10 +42,8 @@ async def create_pesanan (data_to_add: List[Menu], is_hemat : bool, user: Annota
     }
     formatted_data = [{"Id": item.Id, "MenuId": item.MenuId, "Jumlah": item.Jumlah} for item in data_to_add]
     input = {
-        "Pemesan" : user['username'],
         "Data" : formatted_data,
         "Total" : 20000,
-        "Alamat" : "Gang Kubangsari III"
     }
 
     try:
@@ -58,7 +56,7 @@ async def create_pesanan (data_to_add: List[Menu], is_hemat : bool, user: Annota
             "user_id" : user['id'],
             "food_id" : 17,
             "is_hemat" : is_hemat,
-            "pesanan_id" : data['Data'][0]['Id'],
+            "pesanan_id" : data['PesananId'],
             "shipping_price" : 10
         }
 
